@@ -772,29 +772,38 @@ C)
 
 If ``run_mode="priority"``, another helper function will be invoked, namely ``_add_priority_based``. 
 
-Now first we make sure that the task we are trying to add does not have the lowest possible priority. We 
-also make sure that the task is not already in task manager. In both these cases we print some message and return.
+First we check if the new task has the lowest acceptable priority. If so, we return and print out a message 
+to screen.
 
-We will first define two indicator variable and initilize them to -1:
+Looping over members of task manager is itself of O(1) time complexity. Then what we will have to do is to 
+make sure that the task does not exist in the task manager if `duplicates_allowed= False`. We can check it 
+either in the beggining or at the end if we have found a task with smaller priority. This will add another 
+O(n) complexity. In other words, we will have sort of 2 ```for-loops```.
 
-- index_to_remove = -1
-- previous_low_priority = -1
+To avoid this happen, we create some indicator variables and we update them in one single for loop. While 
+we are looping over tasks of the task manager, we also compare the ```pid``` of the new task and existing 
+task under progress in the loop. If we find two tasks with similar pids, then we conclude that the tasks 
+are identical. In this case we print out a message and return.
 
-We will also create another indicator variable to record position of oldest and smalllest task: `current_index =0`
+This approach will push us to complete one full for loop, even though in earilre steps we had found a 
+task with smaller or a task with the smallest priority, but in return will give rise to complexity of 
+only O(1).
 
-Now we will compare the priority of our new task with existing ones. As soon as we find a task with lowr priority, 
-then we will update "index_to_remove" with the position of the task in task manager. If the task which is found is 
-the lowest of all available priorities, then we have found the task of interest (task with the smallest priority that is oldest) 
-and we stop iteration. If it is not 
-of the smallest available priorities we keep searching and exhaust the loop, but only update 
-the "index_to_remove" if we find smaller than what 
-we have found so far.
+All we will need to do is to update value of `index_to_remove`.
 
-At the end, if value of "index_to_remove" has not changed and "index_to_remove= -1", then we report there is no task 
-with smaller priority. But if value of "index_to_remove" has changed, then we kill the job in the position of 
-"index_to_remove" and add the new task.
+- Record the position and priority value of the first smaller or the smallest task and update `index_to_remove`.
+- Continue the loop and make sure that there is no smaller priority than what we have found in the 
+  previous step. 
+  - If there is, update the indicator's value (previously assigned values).
+  - If there is not smaller task, then exhaust the for loop in search for duplicate task!
+  
+At the end, if the value of `index_to_remove` has not changed, then we report there is no task 
+with smaller priority. But if its value is updated, then we kill the job in the position of 
+`index_to_remove` and add the new task to task manager.
 
- In this case he time complexity could be of ``O(n*n)``.
+ **In this case he time complexity will be ``O(n)``.**
+
+In all above mentioned scenarios, if we accept duplicate tasks, the time complexity will become constant. 
 
 ##### Kill group methods
 We have implemented 3 methods here:

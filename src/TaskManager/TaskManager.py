@@ -189,39 +189,34 @@ class TaskManager:
                 New task to be added to container.
         """
 
-        # Set index_to_remove to -1 and update it in the following loop. If it gets updated and its value changes,
-        # Then we have found a task with lower priority which was oldest.
-        index_to_remove = -1
-        current_index = 0
-        previous_low_priority = -1
-
         # If new task has smallest priority. Return.
         if new_task.get_priority.value == min(Priority).value:
             mlogger("Task has smallest possible priority and can not be replaced with existing tasks in task manager.")
             return
 
-        try:
-            self._check_if_task_not_exists(new_task)
-        except DuplicateTaskError:
-            mlogger("Task is already in task manager.")
-            return
+        # Set index_to_remove to -1 and update it in the following loop. If it gets updated and its value changes,
+        # Then we have found a task with lower priority which was oldest.
+        index_to_remove = -1
+        current_index = 0
+        previous_low_priority = -1
+        check_dup_status = not self.duplicates_allowed
 
         for task in self.tasks_queue:
+            if check_dup_status:
+                if new_task.get_pid == task.get_pid:
+                    mlogger("Task is already in task manager.")
+                    return
             if new_task.get_priority > task.get_priority:
-                if index_to_remove == -1:
-                    # register occurence of first low priority
+                if index_to_remove == -1 and previous_low_priority == -1:
+
+                    # Record occurrence of first low priority and update indicators
                     index_to_remove = current_index
                     previous_low_priority = task.get_priority
 
-                    # Place holder for future development in case of more than 3 prio level
+                # This will only run if we have previously found one replacement and current task priority is smaller
                 elif index_to_remove != -1 and task.get_priority < previous_low_priority:
                     index_to_remove = current_index
-                    current_low_priority = task.get_priority
-
-                if task.get_priority.value == min(Priority).value:
-                    # first occurence of lowest priority. Update the index and exit the search
-                    index_to_remove = current_index
-                    break
+                    previous_low_priority = task.get_priority
 
             current_index = current_index + 1
 
