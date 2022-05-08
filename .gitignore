@@ -1,0 +1,14 @@
+__pycache__
+src/TaskManager/__pycache__/*
+src/TaskManager/__pycache*
+*pycache*
+tests/__pycache__/*
+tests/__pycache__
+venv
+my_venv
+venv/*
+my_venv/*
+data/logs/*.log
+.DS_Store
+.idea
+.idea/*
