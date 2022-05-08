@@ -97,8 +97,13 @@ if __name__ == "__main__":
 
     logger.info("Log running jobs ordered by priority:")
     logger.info(task_manager.list_running_tasks(by="priority"))
-    print(task_manager.get_max_queue_size)
-    print(task_manager.get_run_method)
+    logger.info(f"Max size of task manager container is: {task_manager.get_max_queue_size}")
+
     task_manager.print_method()
     task_manager.print_max_queue_size()
+
+    logger.info("Shutting down the task manager:")
+    task_manager.kill_all_tasks()
+
+
 
