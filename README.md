@@ -184,7 +184,6 @@ With this in mind and in order to have more flexible class that can also be furt
 to a new implementation, utilizing ```class``` ecosystem in Python. The new implementation is:
 
 ```python
-
 class Task:
     """
      A class to create a task with unique identifier and priority level
@@ -197,7 +196,7 @@ class Task:
          Represents pid (id) of task
      priority: : Priority
          Represents priority of ask
-     is_active : int
+     is_active : bool
          Shows status of task
 
      Methods
@@ -225,7 +224,7 @@ class Task:
                 Represents pid (id) of task
             priority:  Priority
                 Represents priority of ask
-            is_active : bool
+            is_active : int
                 Shows status of task
                 """
 
@@ -250,7 +249,7 @@ class Task:
         return self.__pid
 
     @property
-    def get_priority(self):
+    def get_priority(self) -> Priority:
         """Helper to return priority of task"""
         return self.__priority
 
@@ -260,7 +259,10 @@ class Task:
 
     def set_priority(self, value) -> None:
         """Helper to set priority of task."""
-        self.__priority = value
+        if isinstance(value, Priority):
+            self.__priority = value
+        else:
+            print(f"{value} is not of type 'Priority'. Please provide a valid value!")
 
     def __eq__(self, other) -> bool:
         return True if self.__pid == other.__pid else False
@@ -270,6 +272,7 @@ class Task:
 
     def __str__(self) -> str:
         return f"pid='{self.__pid}', priority= <{self.__priority.name}:{self.__priority.value}>, is_active={self.is_active}"
+
 
 ```
 #### Class Attributes
@@ -283,6 +286,9 @@ We do know that `pid` and `priority` will not change and a process will die with
 pid and priority it was created, that is why we implemented these attributes as ``private`` 
 member, but letting an advanced user to be able to manipulate at least the `priority` attribute, 
 by means of a ```set_priority``` function.
+
+**Note that priority setter could be implemented differently, but with this implementation we want 
+to make sure that the users knows what they are applying with explicit call to  ```set_priority``` function.**
 
 I believe it is a good practice to do so, and in this way we make sure that other programs 
 and processes can not unexpectedly modify values of `pid` and `priority`, unless setter functions 
@@ -335,7 +341,7 @@ Let us first demonestrate the code and look at what happens in the code. For sim
 
 our initializer reads:
 
-```python
+````python
 """
 The class is used for Task Manager creation.
 """
@@ -408,7 +414,7 @@ class TaskManager:
         if max_queue_size == 0:
             raise EmptyTaskManagerError("Empty task manager container is not permitted.")
         if run_mode not in ("default", "fifo", "priority"):
-            raise Exception("'method' can only be in ('default', 'fifo', 'priority')")
+            raise Exception("'run_mode' can only be in ('default', 'fifo', 'priority')")
         if not type(max_queue_size) is int:
             raise TypeError("Only integers are allowed")
 
@@ -434,22 +440,28 @@ class TaskManager:
         """
         print(f"Container has size of {self.__max_queue_size}")
 
-    def set_max_queue_size(self, max_queue_size):
+    def set_max_queue_size(self, max_queue_size) -> None:
         """sets new value to max_queue_size."""
-        self.__max_queue_size = max_queue_size
+        if isinstance(max_queue_size, int):
+            self.__max_queue_size = max_queue_size
+        else:
+            print(f"{max_queue_size} should be integer value.")
 
     @property
     def get_max_queue_size(self) -> int:
         "Returns size of container."
         return self.__max_queue_size
 
-    def print_method(self) -> None:
+    def print_run_mode(self) -> None:
         """Prints run method"""
         print(f"Run method is {self.__run_mode}")
 
     def set_run_method(self, new_run_mode):
         """sets new value to run_mode."""
-        self.__run_mode = new_run_mode
+        if isinstance(new_run_mode, str) and new_run_mode in ("default", "fifo", "priority"):
+            self.__run_mode = new_run_mode
+        else:
+            print("'new_run_mode' can only be in ('default', 'fifo', 'priority')")
 
     @property
     def get_run_method(self) -> str:
@@ -634,7 +646,8 @@ class TaskManager:
         else:
             return sorted(self.tasks_queue, key=lambda t: t.get_priority, reverse=reverse) if by == "priority" \
                 else sorted(self.tasks_queue, key=lambda t: t.get_pid, reverse=reverse)
-```
+````
+
 
 
 ````python

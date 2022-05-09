@@ -71,7 +71,7 @@ class Task:
         return self.__pid
 
     @property
-    def get_priority(self):
+    def get_priority(self) -> Priority:
         """Helper to return priority of task"""
         return self.__priority
 
@@ -81,7 +81,10 @@ class Task:
 
     def set_priority(self, value) -> None:
         """Helper to set priority of task."""
-        self.__priority = value
+        if isinstance(value, Priority):
+            self.__priority = value
+        else:
+            print(f"{value} is not of type 'Priority'. Please provide a valid value!")
 
     def __eq__(self, other) -> bool:
         return True if self.__pid == other.__pid else False

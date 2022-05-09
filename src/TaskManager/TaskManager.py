@@ -76,7 +76,7 @@ class TaskManager:
         if max_queue_size == 0:
             raise EmptyTaskManagerError("Empty task manager container is not permitted.")
         if run_mode not in ("default", "fifo", "priority"):
-            raise Exception("'method' can only be in ('default', 'fifo', 'priority')")
+            raise Exception("'run_mode' can only be in ('default', 'fifo', 'priority')")
         if not type(max_queue_size) is int:
             raise TypeError("Only integers are allowed")
 
@@ -102,22 +102,28 @@ class TaskManager:
         """
         print(f"Container has size of {self.__max_queue_size}")
 
-    def set_max_queue_size(self, max_queue_size):
+    def set_max_queue_size(self, max_queue_size) -> None:
         """sets new value to max_queue_size."""
-        self.__max_queue_size = max_queue_size
+        if isinstance(max_queue_size, int):
+            self.__max_queue_size = max_queue_size
+        else:
+            print(f"{max_queue_size} should be integer value.")
 
     @property
     def get_max_queue_size(self) -> int:
         "Returns size of container."
         return self.__max_queue_size
 
-    def print_method(self) -> None:
+    def print_run_mode(self) -> None:
         """Prints run method"""
         print(f"Run method is {self.__run_mode}")
 
     def set_run_method(self, new_run_mode):
         """sets new value to run_mode."""
-        self.__run_mode = new_run_mode
+        if isinstance(new_run_mode, str) and new_run_mode in ("default", "fifo", "priority"):
+            self.__run_mode = new_run_mode
+        else:
+            print("'new_run_mode' can only be in ('default', 'fifo', 'priority')")
 
     @property
     def get_run_method(self) -> str:
